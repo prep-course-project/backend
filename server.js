@@ -13,18 +13,22 @@ app.use(cors());
 const Client=new pg.Client(DBURL);
 
 app.get('/',async(req,res)=>{
+  const allQueryes={...req.query}
+  const location=req.query.locationExternalIDs;
+  console.log(location)
   const options = {
     method: 'GET',
     url: `${APIUrl}/properties/list`,
     params: {
-      locationExternalIDs: '5002,6020',
+      locationExternalIDs: location||'5002,6020',
       purpose: 'for-rent',
       hitsPerPage: '25',
       page: '0',
       lang: 'en',
       sort: 'city-level-score',
       rentFrequency: 'monthly',
-      categoryExternalID: '4'
+      categoryExternalID: '4',
+      ...allQueryes,
     },
     headers: {
       'X-RapidAPI-Key': `${KEY}`,
@@ -48,7 +52,7 @@ app.get('/properites/detail',async(req,res)=>{
         externalID: `${id}`
       },
       headers: {
-        'X-RapidAPI-Key': '23b7b0b684msh82ae32f9dad06f4p17313bjsn1460690fb7f7',
+        'X-RapidAPI-Key': KEY,
         'X-RapidAPI-Host': 'bayut.p.rapidapi.com'
       }
     };
@@ -60,21 +64,22 @@ app.get('/properites/detail',async(req,res)=>{
       console.error(error);
     }
 })
-app.get('/propertyList/city',async(req,res)=>{
-    let city=req.query.city;
+app.get('/propertyList/autoComplete',async(req,res)=>{
+    let userQuery=req.query.q;
     let url=`${APIUrl}/auto-complete`
-    console.log(url)
+    console.log(url,userQuery)
+
     const options = {
         method: 'GET',
         url: url,
         params: {
-          query: `${city}`,
+          query: `${userQuery}`,
           hitsPerPage: '25',
           page: '1',
           lang: 'en'
         },
         headers: {
-          'X-RapidAPI-Key': '23b7b0b684msh82ae32f9dad06f4p17313bjsn1460690fb7f7',
+          'X-RapidAPI-Key':KEY ,
           'X-RapidAPI-Host': 'bayut.p.rapidapi.com'
         }
       };
