@@ -98,15 +98,28 @@ app.get('/favorites',(req,res)=>{
  })
 
  app.post('/favorites',async(req,res)=>{
-  const {externalID,price,title,thumbNail,area,purpose}=req.body;
-  if(externalID&&price&&title&&imgUrl){
-    const postFavCommand=`INSERT INTO Favorites(externalId,price,title,thumbNail,area,purpose) values ($1,$2,$3,$4) RETURNING *;`;
-    const values=[externalID,price,title,thumbNail,area,purpose]
+  const {externalID,price,title,imgUrl,area,purpose}=req.body;
+  console.log(req.body)
+  // if(externalID&&price&&title&&imgUrl){
+    const postFavCommand=`INSERT INTO Favorites(externalId,price,title,imgUrl,area,purpose) values ($1,$2,$3,$4,$5,$6) RETURNING *;`;
+    const values=[externalID,price,title,imgUrl,area,purpose]
     Client.query(postFavCommand,values)
-    .then(response=>res.status(204).send(response))
+    .then(response=>res.status(202).send(response.rows))
     .catch(err=>console.log(err))
-  }else res.status(400).send('please provide correct data')
+  // }else res.status(400).send('please provide correct data')
  })
+
+ app.delete('/favorites', (req,res) =>{
+  const externalID = req.body.externalID
+  const sql = `DELETE FROM Favorites WHERE externalID = ${externalID}`
+
+  Client.query(sql).then(result => {
+    res.status(204).json({
+      deleteResult : result.rows
+    })
+  })
+ })
+
  Client.connect().then(con=>{
     app.listen(PORT,()=>{
         console.log(con);
