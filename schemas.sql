@@ -3,5 +3,7 @@ CREATE TABLE IF NOT EXISTS Favorites(
     externalID integer ,
     price float,
     title varChar(10000),
-    imgUrl varChar(1000)
+    coverPhoto varChar(1000),
+    area varChar(10000),
+    purpose varChar(300)
 )   

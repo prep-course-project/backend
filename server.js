@@ -98,10 +98,10 @@ app.get('/favorites',(req,res)=>{
  })
 
  app.post('/favorites',async(req,res)=>{
-  const {externalID,price,title,imgUrl}=req.body;
+  const {externalID,price,title,thumbNail,area,purpose}=req.body;
   if(externalID&&price&&title&&imgUrl){
-    const postFavCommand=`INSERT INTO Favorites(externalId,price,title,imgUrl) values ($1,$2,$3,$4) RETURNING *;`;
-    const values=[externalID,price,title,imgUrl]
+    const postFavCommand=`INSERT INTO Favorites(externalId,price,title,thumbNail,area,purpose) values ($1,$2,$3,$4) RETURNING *;`;
+    const values=[externalID,price,title,thumbNail,area,purpose]
     Client.query(postFavCommand,values)
     .then(response=>res.status(204).send(response))
     .catch(err=>console.log(err))
