@@ -140,6 +140,33 @@ app.get('/favorites',(req,res)=>{
     res.status(500).send(err)
   })
  })
+ // jadaan 
+ app.get('/commint/:id',(req,res)=>{
+  const id=req.params.id
+  const commint=`SELECT * FROM commint where id=${id}`;
+   Client.query(commint)
+   .then(res=>{
+    res.status(200).send(res.rows);
+   })
+   .catch(err=>{
+    res.status(500).send(err);
+   })});
+
+   app.post('/commint/:id',(req,res)=>{
+    const userInput=req.body
+    const externalID=req.params.id
+    console.log(req.body)
+    const sql=`INSERT INTO commint(Name,Email,commint,Rating,externalID) values [$1,$2,$3,$4,$5] RETURNING *;`;
+    const values=[userInput.Name,userInput.Email,userInput.commint,userInput.Rating,externalID];
+    Client(sql,values)
+    .then(res=>{
+      res.status(200).send(res.rows)
+    })
+    .catch(err=>{
+      res.status(500).send(err)
+    })
+   })
+ 
 
  Client.connect().then(con=>{
     app.listen(PORT,()=>{

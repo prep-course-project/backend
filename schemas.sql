@@ -19,3 +19,11 @@ CREATE TABLE IF NOT EXISTS UserProperties(
     propertyType varChar(1000),
     cityName varChar(100)
 )
+CREATE TABLE IF NOT EXISTS commint(
+    id serial primary key,
+        externalID integer ,
+        Name varChar(1000),
+    Email varChar(1000),,
+    commint varChar (1000),
+    Rating varChar(1000)
+)
