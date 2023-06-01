@@ -8,7 +8,7 @@ const APIUrl=process.env.API;
 const KEY=process.env.KEY;
 const pg=require('pg')
 const DBURL=process.env.DBURL;
-app.use(express.json());
+app.use(express.json());  
 app.use(cors());
 const Client=new pg.Client(DBURL);
 
