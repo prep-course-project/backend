@@ -136,10 +136,11 @@ app.get('/favorites',(req,res)=>{
   .catch(err=>res.status(500).send(err))
  })
  app.get('/usersProperties',(req,res)=>{
+  console.log('in get user properties')
   const sqlGetCommand=`SELECT * FROM UserProperties`;
    Client.query(sqlGetCommand)
-   .then(res=>{
-    res.status(200).send(res.rows);
+   .then(response=>{
+    res.status(200).send(response.rows);
    })
    .catch(err=>{
     res.status(500).send(err);
@@ -147,16 +148,12 @@ app.get('/favorites',(req,res)=>{
 
  });
  app.post('/usersProperties',(req,res)=>{
-  const {title,area,purpose,roomNum,bathNum,propertyDescription,price,propertyType,cityName}=req.body
-  console.log(req.body)
-  const sqlPostCommand=`INSERT INTO UserProperties(title,area,purpose,price,roomNum,bathNum,propertyDescription,propertyType,cityName) values ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *;`;
-  const values=[title,area,purpose,roomNum,bathNum,propertyDescription,price,propertyType,cityName];
+  const {title,area,purpose,roomsNum,bathsNum,propertyDescription,price,propertyType,cityName}=req.body
+  const sqlPostCommand=`INSERT INTO UserProperties(title,area,purpose,price,roomsNum,bathsNum,propertyDescription,propertyType,cityName) values ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *;`;
+  const values=[title,area,purpose,price,roomsNum,bathsNum,propertyDescription,propertyType,cityName];
   Client.query(sqlPostCommand,values)
-  .then(res=>{
-    res.status(200).send(res)
-  })
-  .catch(err=>{
-    res.status(500).send(err)
+  .then(response=>{ 
+    res.status(201).send(response.rows)
   })
  })
  // jadaan 

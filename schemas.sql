@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS comment(
     id serial primary key,
         externalID integer ,
         commentName varChar(1000),
-    Email varChar(1000),
-    comment varChar (1000),
-    Rating varChar(1000)
+        Email varChar(1000),
+       comment varChar (1000),
+       Rating varChar(1000)
 )
