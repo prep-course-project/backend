@@ -165,10 +165,12 @@ app.get('/favorites',(req,res)=>{
   console.log("in get comment",id)
   const comment=`SELECT * FROM comment where externalID=${id}`;
    Client.query(comment)
-   .then(res=>{
-    res.status(200).send(res.rows);
+   .then(response=>{
+    console.log(response)
+    res.status(200).send(response.rows);
    })
    .catch(err=>{
+    console.log(err)
     res.status(500).send(err);
    })});
 
