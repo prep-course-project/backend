@@ -18,12 +18,12 @@ CREATE TABLE IF NOT EXISTS UserProperties(
     bathsNum integer,
     propertyType varChar(1000),
     cityName varChar(100)
-)
-CREATE TABLE IF NOT EXISTS commint(
+);
+CREATE TABLE IF NOT EXISTS comment(
     id serial primary key,
         externalID integer ,
         Name varChar(1000),
-    Email varChar(1000),,
-    commint varChar (1000),
+    Email varChar(1000),
+    comment varChar (1000),
     Rating varChar(1000)
 )
