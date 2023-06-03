@@ -162,7 +162,7 @@ app.get('/favorites',(req,res)=>{
  // jadaan 
  app.get('/comment/:id',(req,res)=>{
   const id=req.params.id
-  console.log("in get comment")
+  console.log("in get comment",id)
   const comment=`SELECT * FROM comment where externalID=${id}`;
    Client.query(comment)
    .then(res=>{
