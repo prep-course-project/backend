@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS comment;
 CREATE TABLE IF NOT EXISTS Favorites(
     id serial primary key,
     externalID integer ,
@@ -22,7 +23,7 @@ CREATE TABLE IF NOT EXISTS UserProperties(
 CREATE TABLE IF NOT EXISTS comment(
     id serial primary key,
         externalID integer ,
-        Name varChar(1000),
+        commentName varChar(1000),
     Email varChar(1000),
     comment varChar (1000),
     Rating varChar(1000)

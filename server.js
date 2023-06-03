@@ -3,15 +3,21 @@ const cors=require('cors');
 const axios=require('axios');
 const app=express();
 const path=require('path');
+var bodyParser = require('body-parser');
 require('dotenv').config()
 const PORT=process.env.PORT||5000
 const APIUrl=process.env.API;
+const DBURL=process.env.DBURL;
 const KEY=process.env.KEY;
 const pg=require('pg')
-const DBURL=process.env.DBURL;
+const Client=new pg.Client(DBURL);
 const { v4: uuidv4 } = require('uuid');
-app.use(express.json());  
 app.use(cors());
+app.use(express.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(bodyParser.json());
 const muliter=require('multer');
 const storage= muliter.diskStorage({
 destination:(req,file,cb)=>{
@@ -22,7 +28,7 @@ filename:(req,file,cb)=>{
 }
 })
 const upload=muliter({storage:storage})
-const Client=new pg.Client(DBURL);
+
 
 app.get('/',async(req,res)=>{
   console.log('in get ')
@@ -141,11 +147,11 @@ app.get('/favorites',(req,res)=>{
 
  });
  app.post('/usersProperties',(req,res)=>{
-  const {title,area,purpose,roomNum,bathNum,propertyDescription,price,propertyType,cityName}=req.body.properyType
+  const {title,area,purpose,roomNum,bathNum,propertyDescription,price,propertyType,cityName}=req.body
   console.log(req.body)
-  const sqlPostCommand=`INSERT INTO UserProperties(title,area,purpose,price,roomNum,bathNum,propertyDescription,propertyType,cityName) values [$1,$2,$3,$4,$5,$6,$7,$8,$9] RETURNING *;`;
+  const sqlPostCommand=`INSERT INTO UserProperties(title,area,purpose,price,roomNum,bathNum,propertyDescription,propertyType,cityName) values ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *;`;
   const values=[title,area,purpose,roomNum,bathNum,propertyDescription,price,propertyType,cityName];
-  Client(sqlPostCommand,values)
+  Client.query(sqlPostCommand,values)
   .then(res=>{
     res.status(200).send(res)
   })
@@ -168,15 +174,15 @@ app.get('/favorites',(req,res)=>{
    app.post('/comment/:id',(req,res)=>{
     const userInput=req.body
     const externalID=req.params.id
-    console.log(req.body)
-    const sql=`INSERT INTO comment(Name,Email,comment,Rating,externalID) values [$1,$2,$3,$4,$5] RETURNING *;`;
-    const values=[userInput.Name,userInput.Email,userInput.comment,userInput.Rating,externalID];
-    Client(sql,values)
-    .then(res=>{
-      res.status(200).send(res.rows)
+    console.log(req.body,'in comment')
+    const sql=`INSERT INTO comment(commentName,Email,comment,Rating,externalID) values ($1,$2,$3,$4,$5) RETURNING *;`;
+    const values=[userInput.commentName,userInput.Email,userInput.comment,userInput.Rating,externalID];
+    Client.query(sql,values)
+    .then(response=>{
+      res.status(200).send(response.rows)
     })
     .catch(err=>{
-      res.status(500).send(err)
+      console.log(err)
     })
    })
  app.post('/property/imgUpload',upload.single('propertyImg'),(req,res)=>{
