@@ -162,7 +162,8 @@ app.get('/favorites',(req,res)=>{
  // jadaan 
  app.get('/comment/:id',(req,res)=>{
   const id=req.params.id
-  const comment=`SELECT * FROM comment where id=${id}`;
+  console.log("in get comment")
+  const comment=`SELECT * FROM comment where externalID=${id}`;
    Client.query(comment)
    .then(res=>{
     res.status(200).send(res.rows);
@@ -182,7 +183,7 @@ app.get('/favorites',(req,res)=>{
       res.status(200).send(response.rows)
     })
     .catch(err=>{
-      console.log(err)
+      res.status(500).send(err)
     })
    })
  app.post('/property/imgUpload',upload.single('propertyImg'),(req,res)=>{
