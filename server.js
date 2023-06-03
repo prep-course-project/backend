@@ -18,18 +18,6 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(bodyParser.json());
-const muliter=require('multer');
-const storage= muliter.diskStorage({
-destination:(req,file,cb)=>{
-  cb(null,'images')
-},
-filename:(req,file,cb)=>{
-  cb(null,uuidv4()+path.extname(file.originalname))
-}
-})
-const upload=muliter({storage:storage})
-
-
 app.get('/',async(req,res)=>{
   console.log('in get ')
   const allQueryes={...req.query}
@@ -148,9 +136,9 @@ app.get('/favorites',(req,res)=>{
 
  });
  app.post('/usersProperties',(req,res)=>{
-  const {title,area,purpose,roomsNum,bathsNum,propertyDescription,price,propertyType,cityName}=req.body
-  const sqlPostCommand=`INSERT INTO UserProperties(title,area,purpose,price,roomsNum,bathsNum,propertyDescription,propertyType,cityName) values ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *;`;
-  const values=[title,area,purpose,price,roomsNum,bathsNum,propertyDescription,propertyType,cityName];
+  const {title,area,purpose,roomsNum,bathsNum,propertyDescription,price,propertyType,cityName,imgUrl}=req.body;
+  const sqlPostCommand=`INSERT INTO UserProperties(title,area,purpose,price,roomsNum,bathsNum,propertyDescription,propertyType,cityName,imgUrl) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
+  const values=[title,area,purpose,price,roomsNum,bathsNum,propertyDescription,propertyType,cityName,imgUrl];
   Client.query(sqlPostCommand,values)
   .then(response=>{ 
     res.status(201).send(response.rows)
@@ -179,17 +167,13 @@ app.get('/favorites',(req,res)=>{
     const values=[userInput.commentName,userInput.Email,userInput.comment,userInput.Rating,externalID];
     Client.query(sql,values)
     .then(response=>{
+      getPropertyImg(response.rows.id)
       res.status(200).send(response.rows)
     })
     .catch(err=>{
       res.status(500).send(err)
     })
-   })
- app.post('/property/imgUpload',upload.single('propertyImg'),(req,res)=>{
-  console.log('in upload')
-  res.status(200).send('image uploaded');
- })
-
+   });
  Client.connect().then(con=>{
     app.listen(PORT,()=>{
         console.log(con);
