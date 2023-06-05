@@ -155,7 +155,7 @@ app.get('/favorites',async(req,res,next)=>{
       const favoriteProperties=await Client.query(getFavCommand);
       console.log(favoriteProperties,'favorites')
       if (favoriteProperties){
-          res.status(200).send(favoriteProperties)
+          res.status(200).send(favoriteProperties.rows)
       }
   }
   catch(err){
