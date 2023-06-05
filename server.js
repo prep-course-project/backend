@@ -110,7 +110,7 @@ app.get('/userProperties',(req,res,next)=>{
     res.status(500).send(err);
    })
 
-})
+});
 app.post('/userProperties',(req,res,next)=>{
   const {title,area,purpose,roomsNum,bathsNum,propertyDescription,price,propertyType,cityName,imgUrl}=req.body;
   const sqlPostCommand=`INSERT INTO UserProperties(title,area,purpose,price,roomsNum,bathsNum,propertyDescription,propertyType,cityName,imgUrl) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
@@ -170,7 +170,7 @@ app.post('/favorites',async(req,res,next)=>{
   const values=[externalID,price,title,imgUrl,area,purpose];
   try{
       const response=await Client.query(postFavCommand,values);
-      res.status(202).send(response)
+      res.status(202).send(response.rows)
     
   }catch(err){
       res.status(500).send(err)
