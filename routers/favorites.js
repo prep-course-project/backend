@@ -4,12 +4,15 @@ const DBURL=process.env.DBURL;
 require('dotenv').config()
 const pg=require('pg')
 const Client=new pg.Client(DBURL);
+
 router.get('/',async(req,res,next)=>{
+    console.log("in fav")
     try{
         const getFavCommand=`SELECT * from Favorites`
         const favoriteProperties=await Client.query(getFavCommand);
-        console.log(favoriteProperties,'favorites')
+        console.log(favoriteProperties);
         if (favoriteProperties){
+            console.log('favoriteProperties',favoriteProperties);
             res.status(200).send(favoriteProperties)
         }
     }
