@@ -140,30 +140,7 @@ app.post('/comment/:id',(req,res,next)=>{
   console.log(req.body,'in comment')
   const sql=`INSERT INTO comment(commentName,Email,comment,Rating,externalID) values ($1,$2,$3,$4,$5) RETURNING *;`;
   const values=[userInput.commentName,userInput.Email,userInput.comment,userInput.Rating,externalID];
-  Client.query(sql,values)
-  .then(response=>{
-    getPropertyImg(response.rows.id)
-    res.status(200).send(response.rows)
-  })
-  .catch(err=>{
-    res.status(500).send(err)
-  })
-})
-app.get('/favorites',async(req,res,next)=>{
-  try{
-      const getFavCommand=`SELECT * from Favorites`
-      const favoriteProperties=await Client.query(getFavCommand);
-      console.log(favoriteProperties,'favorites')
-      if (favoriteProperties){
-          res.status(200).send(favoriteProperties.rows)
-      }
-  }
-  catch(err){
-      console.log(err)
-      res.status(500).send(err);
-  }
 
-})
 app.post('/',async(req,res,next)=>{
   const {externalID,price,title,imgUrl,area,purpose}=req.body;
   const postFavCommand=`INSERT INTO Favorites(externalId,price,title,imgUrl,area,purpose) values ($1,$2,$3,$4,$5,$6) RETURNING *;`;
@@ -186,13 +163,32 @@ app.delete('/:id', (req,res) =>{
   })
   .catch(err=>res.status(500).send(err))
  })
+
+
+app.get('/favorites',async(req,res,next)=>{
+  try{
+      const getFavCommand=`SELECT * from Favorites`
+      const favoriteProperties=await Client.query(getFavCommand);
+      console.log(favoriteProperties,'favorites')
+      if (favoriteProperties){
+          res.status(200).send(favoriteProperties.rows)
+      }
+  }
+  catch(err){
+      console.log(err)
+      res.status(500).send(err);
+  }
+
+})
  
-   app.get('*',(req,res)=>{
-    res.send('page not found ')
-   })
- Client.connect().then(con=>{
-    app.listen(PORT,()=>{
-        console.log(con);
-        console.log(`listening on ${PORT}`)
-    })
+app.get('*',(req,res)=>{
+  res.send('page not found ')
+ })
+Client.query(sql,values)
+.then(response=>{
+  res.status(200).send(response.rows)
+})
+.catch(err=>{
+  res.status(500).send(err)
+})
 })
