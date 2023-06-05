@@ -2,7 +2,6 @@ const express=require('express');
 const cors=require('cors');
 const axios=require('axios');
 const app=express();
-const path=require('path');
 var bodyParser = require('body-parser');
 require('dotenv').config()
 const PORT=process.env.PORT||5000
@@ -11,7 +10,9 @@ const DBURL=process.env.DBURL;
 const KEY=process.env.KEY;
 const pg=require('pg')
 const Client=new pg.Client(DBURL);
-const { v4: uuidv4 } = require('uuid');
+const favoritesRoute=require('./routers/favorites');
+const userPropertiesRoute=require('./routers/userPropertiesRoute')
+const propertyCommentsRoute=require('./routers/propertyComments')
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({
@@ -97,83 +98,12 @@ app.get('/propertyList/autoComplete',async(req,res)=>{
         res.status(500).send(error)
       }
 })
-app.get('/favorites',(req,res)=>{
-  const getFavCommand=`SELECT * from Favorites`
-  Client.query(getFavCommand)
-  .then(response=>res.status(200).send(response.rows))
-  .catch(err=>console.log(err))
- })
-
- app.post('/favorites',async(req,res)=>{
-  const {externalID,price,title,imgUrl,area,purpose}=req.body;
-    const postFavCommand=`INSERT INTO Favorites(externalId,price,title,imgUrl,area,purpose) values ($1,$2,$3,$4,$5,$6) RETURNING *;`;
-    const values=[externalID,price,title,imgUrl,area,purpose]
-    Client.query(postFavCommand,values)
-    .then(response=>res.status(202).send(response.rows))
-    .catch(err=>res.status(500).send(err))
-  
- })
- app.delete('/favorites/:id', (req,res) =>{
-  const externalID = req.params.id;
-  const sql = `DELETE FROM Favorites WHERE externalID = ${externalID}`
-  Client.query(sql).then(result => {
-    res.status(204).json({
-      deleteResult : result.rows
-    })
-  })
-  .catch(err=>res.status(500).send(err))
- })
- app.get('/usersProperties',(req,res)=>{
-  console.log('in get user properties')
-  const sqlGetCommand=`SELECT * FROM UserProperties`;
-   Client.query(sqlGetCommand)
-   .then(response=>{
-    res.status(200).send(response.rows);
+app.use('/favorites',favoritesRoute);
+app.use('/usersProperties',userPropertiesRoute);
+ app.use('/comments',propertyCommentsRoute);
+   app.get('*',(req,res)=>{
+    res.send('page not found ')
    })
-   .catch(err=>{
-    res.status(500).send(err);
-   })
-
- });
- app.post('/usersProperties',(req,res)=>{
-  const {title,area,purpose,roomsNum,bathsNum,propertyDescription,price,propertyType,cityName,imgUrl}=req.body;
-  const sqlPostCommand=`INSERT INTO UserProperties(title,area,purpose,price,roomsNum,bathsNum,propertyDescription,propertyType,cityName,imgUrl) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
-  const values=[title,area,purpose,price,roomsNum,bathsNum,propertyDescription,propertyType,cityName,imgUrl];
-  Client.query(sqlPostCommand,values)
-  .then(response=>{ 
-    res.status(201).send(response.rows)
-  })
- })
- // jadaan 
- app.get('/comment/:id',(req,res)=>{
-  const id=req.params.id
-  console.log("in get comment",id)
-  const comment=`SELECT * FROM comment where externalID=${id}`;
-   Client.query(comment)
-   .then(response=>{
-    console.log(response)
-    res.status(200).send(response.rows);
-   })
-   .catch(err=>{
-    console.log(err)
-    res.status(500).send(err);
-   })});
-
-   app.post('/comment/:id',(req,res)=>{
-    const userInput=req.body
-    const externalID=req.params.id
-    console.log(req.body,'in comment')
-    const sql=`INSERT INTO comment(commentName,Email,comment,Rating,externalID) values ($1,$2,$3,$4,$5) RETURNING *;`;
-    const values=[userInput.commentName,userInput.Email,userInput.comment,userInput.Rating,externalID];
-    Client.query(sql,values)
-    .then(response=>{
-      getPropertyImg(response.rows.id)
-      res.status(200).send(response.rows)
-    })
-    .catch(err=>{
-      res.status(500).send(err)
-    })
-   });
  Client.connect().then(con=>{
     app.listen(PORT,()=>{
         console.log(con);
