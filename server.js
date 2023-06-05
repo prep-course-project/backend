@@ -98,9 +98,95 @@ app.get('/propertyList/autoComplete',async(req,res)=>{
         res.status(500).send(error)
       }
 })
-app.use('/favorites',favoritesRoute);
-app.use('/usersProperties',userPropertiesRoute);
- app.use('/comments',propertyCommentsRoute);
+app.get('/userProperties',(req,res,next)=>{
+  console.log('in get user properties')
+  const sqlGetCommand=`SELECT * FROM UserProperties`;
+   Client.query(sqlGetCommand)
+   .then(response=>{
+    res.status(200).send(response.rows);
+   })
+   .catch(err=>{
+    console.log('finding')
+    res.status(500).send(err);
+   })
+
+})
+app.post('/userProperties',(req,res,next)=>{
+  const {title,area,purpose,roomsNum,bathsNum,propertyDescription,price,propertyType,cityName,imgUrl}=req.body;
+  const sqlPostCommand=`INSERT INTO UserProperties(title,area,purpose,price,roomsNum,bathsNum,propertyDescription,propertyType,cityName,imgUrl) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
+  const values=[title,area,purpose,price,roomsNum,bathsNum,propertyDescription,propertyType,cityName,imgUrl];
+  Client.query(sqlPostCommand,values)
+  .then(response=>{ 
+    res.status(201).send(response.rows)
+  })
+})
+app.get('/comment/:id',(req,res,next)=>{
+  const id=req.params.id
+  console.log("in get comment",id)
+  const commentCommand=`SELECT * FROM comment where externalID=${id}`;
+   Client.query(commentCommand)
+    .then(response=>{
+      console.log(response)
+    res.status(200).send(response.rows);
+   })
+   .catch(err=>{
+    console.log(err)
+    res.status(500).send(err);
+   })
+})
+app.post('/comment/:id',(req,res,next)=>{
+  const userInput=req.body
+  const externalID=req.params.id
+  console.log(req.body,'in comment')
+  const sql=`INSERT INTO comment(commentName,Email,comment,Rating,externalID) values ($1,$2,$3,$4,$5) RETURNING *;`;
+  const values=[userInput.commentName,userInput.Email,userInput.comment,userInput.Rating,externalID];
+  Client.query(sql,values)
+  .then(response=>{
+    getPropertyImg(response.rows.id)
+    res.status(200).send(response.rows)
+  })
+  .catch(err=>{
+    res.status(500).send(err)
+  })
+})
+app.get('/favorites',async(req,res,next)=>{
+  try{
+      const getFavCommand=`SELECT * from Favorites`
+      const favoriteProperties=await Client.query(getFavCommand);
+      console.log(favoriteProperties,'favorites')
+      if (favoriteProperties){
+          res.status(200).send(favoriteProperties)
+      }
+  }
+  catch(err){
+      console.log(err)
+      res.status(500).send(err);
+  }
+
+})
+app.post('/favorites',async(req,res,next)=>{
+  const {externalID,price,title,imgUrl,area,purpose}=req.body;
+  const postFavCommand=`INSERT INTO Favorites(externalId,price,title,imgUrl,area,purpose) values ($1,$2,$3,$4,$5,$6) RETURNING *;`;
+  const values=[externalID,price,title,imgUrl,area,purpose];
+  try{
+      const response=await Client.query(postFavCommand,values);
+      res.status(202).send(response)
+    
+  }catch(err){
+      res.status(500).send(err)
+  }
+});
+app.delete('/favorites/:id', (req,res) =>{
+  const externalID = req.params.id;
+  const sql = `DELETE FROM Favorites WHERE externalID = ${externalID}`
+  Client.query(sql).then(result => {
+    res.status(204).json({
+      deleteResult : result.rows
+    })
+  })
+  .catch(err=>res.status(500).send(err))
+ })
+ 
    app.get('*',(req,res)=>{
     res.send('page not found ')
    })

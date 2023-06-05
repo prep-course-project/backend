@@ -5,18 +5,31 @@ require('dotenv').config()
 const pg=require('pg')
 const Client=new pg.Client(DBURL);
 router.get('/',async(req,res,next)=>{
-    const getFavCommand=`SELECT * from Favorites`
-    Client.query(getFavCommand)
-    .then(response=>res.status(200).send(response.rows))
-    .catch(err=>console.log(err))
+    try{
+        const getFavCommand=`SELECT * from Favorites`
+        const favoriteProperties=await Client.query(getFavCommand);
+        console.log(favoriteProperties,'favorites')
+        if (favoriteProperties){
+            res.status(200).send(favoriteProperties)
+        }
+    }
+    catch(err){
+        console.log(err)
+        res.status(500).send(err);
+    }
+
 })
-router.post('/',(req,res,next)=>{
+router.post('/',async(req,res,next)=>{
     const {externalID,price,title,imgUrl,area,purpose}=req.body;
     const postFavCommand=`INSERT INTO Favorites(externalId,price,title,imgUrl,area,purpose) values ($1,$2,$3,$4,$5,$6) RETURNING *;`;
-    const values=[externalID,price,title,imgUrl,area,purpose]
-    Client.query(postFavCommand,values)
-    .then(response=>console.log(response))
-    .catch(err=>res.status(500).send(err))
+    const values=[externalID,price,title,imgUrl,area,purpose];
+    try{
+        const response=await Client.query(postFavCommand,values);
+        res.status(202).send(response)
+      
+    }catch(err){
+        res.status(500).send(err)
+    }
 });
 router.delete('/:id', (req,res) =>{
     const externalID = req.params.id;
