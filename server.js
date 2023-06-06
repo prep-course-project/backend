@@ -98,7 +98,7 @@ app.get('/propertyList/autoComplete',async(req,res)=>{
         res.status(500).send(error)
       }
 })
-app.get('/userProperties',(req,res,next)=>{
+app.get('/usersProperties',(req,res,next)=>{
   console.log('in get user properties')
   const sqlGetCommand=`SELECT * FROM UserProperties`;
    Client.query(sqlGetCommand)
@@ -111,7 +111,7 @@ app.get('/userProperties',(req,res,next)=>{
    })
 
 })
-app.post('/userProperties',(req,res,next)=>{
+app.post('/usersProperties',(req,res,next)=>{
   const {title,area,purpose,roomsNum,bathsNum,propertyDescription,price,propertyType,cityName,imgUrl}=req.body;
   const sqlPostCommand=`INSERT INTO UserProperties(title,area,purpose,price,roomsNum,bathsNum,propertyDescription,propertyType,cityName,imgUrl) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;`;
   const values=[title,area,purpose,price,roomsNum,bathsNum,propertyDescription,propertyType,cityName,imgUrl];
