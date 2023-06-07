@@ -164,7 +164,7 @@ app.get('/favorites',async(req,res,next)=>{
   }
 
 })
-app.post('/',async(req,res,next)=>{
+app.post('/favorites/',async(req,res,next)=>{
   const {externalID,price,title,imgUrl,area,purpose}=req.body;
   const postFavCommand=`INSERT INTO Favorites(externalId,price,title,imgUrl,area,purpose) values ($1,$2,$3,$4,$5,$6) RETURNING *;`;
   const values=[externalID,price,title,imgUrl,area,purpose];
@@ -176,7 +176,7 @@ app.post('/',async(req,res,next)=>{
       res.status(500).send(err)
   }
 });
-app.delete('/:id', (req,res) =>{
+app.delete('/favorites/:id', (req,res) =>{
   const externalID = req.params.id;
   const sql = `DELETE FROM Favorites WHERE externalID = ${externalID}`
   Client.query(sql).then(result => {
